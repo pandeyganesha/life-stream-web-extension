@@ -1,4 +1,5 @@
 12 Aug 2026 | 10:18
+
 I came to know that when a url is matched, firefox would inject the website page with my content_scripts.
 Each tab would get its own content_scripts. Hence they should not be used to maintain states as their lifecycle ends with the tab.
 
@@ -42,3 +43,85 @@ Hence for second and third requirement we can either have another Map that simul
 
 But first we must try to compose our strucuture that can handle both requirement instead of having two different structures, if we fail, we use this method.
 
+Actually the `replay` feature is something that we won't use much often, hence it can be slower, but how much time I have spent where is something that I will need moer often, hence it must be fast.
+
+---
+I have figured two ways to store our data.
+
+$$
+\forall t \in T:\quad
+S_t = \left[(s_i, e_i, p_i)\right]_{i=0}^{k_t-1}
+$$
+
+Where:
+
+- $T$ = set of all tabs
+- $t$ = index of a tab in $T$
+- $S_t$ = list of sessions belonging to tab $t$
+- $s_i$ = start timestamp of session $i$
+- $e_i$ = end timestamp of session $i$
+- $p_i$ = pointer to the next session
+- $i$ = index of a session within $S_t$
+- $k_t$ = number of sessions in $S_t$
+
+Each pointer is a pair:
+
+$$
+p_i = (t', j)
+$$
+
+where:
+
+- $t'$ = index of the tab containing the next session
+- $j$ = index of that session within $S_{t'}$
+
+### Example
+
+Suppose:
+
+$$
+T = \{0,1,2\}
+$$
+
+and:
+
+$$
+S_0 =
+[
+(10{:}00, 10{:}05, (1,0)),
+(10{:}10, 10{:}15, (2,0))
+]
+$$
+
+The first session of tab $0$ points to:
+
+$$
+(1,0)
+$$
+
+meaning:
+
+> Go to tab $1$, session $0$.
+
+Therefore, the history can be reconstructed by following these pointers:
+
+$$
+(0,0)
+\rightarrow
+(1,0)
+\rightarrow
+(2,0)
+\rightarrow \cdots
+$$
+
+This effectively forms a **linked history**, where each session points to the session that became active next.
+
+- We can easily create history and we can easily compute time spent by iterating over the list of the tab only, which wont be too long in one day for a modern processor to compute. Also later we might add caching system.
+
+Another model was improvisation of this model, but Then i started to re-evaluate my need to create history for now. I might need it in future, might not. Should I not just implement what I want for now?
+Will it be too tough to change it later when I need? I don't think so, as it is already too simple, nothing too complicated.
+We surely have a way to implement history as shown above, but is it worth it? Will I be really using that?
+
+Or even development wise, should I not first have working prototype and then improve upon it? Also it is small personal project, hence too much planning is also not needed it seems to me.
+
+Hence let me first simply start with simple map where we don't store history and only time spent for each website.
