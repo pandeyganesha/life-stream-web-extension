@@ -125,3 +125,13 @@ We surely have a way to implement history as shown above, but is it worth it? Wi
 Or even development wise, should I not first have working prototype and then improve upon it? Also it is small personal project, hence too much planning is also not needed it seems to me.
 
 Hence let me first simply start with simple map where we don't store history and only time spent for each website.
+
+---
+15 Aug 2026 | 16:02
+
+One lesson I got today is, that we should try to avoid writing code around the buisness logic. Instead the code should (or must, idk ) be written around the data-structures and the Data Strucutres should be created around the Buisness Logic.
+
+In our case, when I wrote methods like update_time_spent_for_site, it was directly operating with things like active_site, previous_site and their time stamps.
+Then I added more listeners on window change event and had to change the code and it all became a mess. Same vars being changed by different entities at different times.
+
+Hence I refactored the code and create a new Data Structure that stores all the data I want, and the functions I am now writing are just stratifying the data from the strucutre and presenting/modifying however I want.
